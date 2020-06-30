@@ -17,3 +17,6 @@ target/zooui-0.1-SNAPSHOT/config/
 target/zooui-0.1-SNAPSHOT/icons/
 target/zooui-0.1-SNAPSHOT/logback.xml
 target/zooui-0.1-SNAPSHOT/org/
+/target/
+/logs/
+/firestorm.log
