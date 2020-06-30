@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 日志级别 -->
+<!-- TRACE < DEBUG < INFO < WARN < ERROR  -->
+<!-- 根节点<configuration>，包含下面三个属性： -->
+<!-- scan: 当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true。 -->
+<!-- scanPeriod: 设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。 -->
+<!-- debug: 当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <!-- 子节点<contextName>：用来设置上下文名称，每个logger都关联到logger上下文，默认上下文名称为default。但可以使用<contextName>设置成其他名字，用于区分不同应用程序的记录。一旦设置，不能修改 -->
+    <contextName>xxx</contextName>
+    <!-- 状态监听器  控制台监听日志-->
+    <!--<statusListener class="ch.qos.logback.core.status.OnConsoleStatusListener" />-->
+
+    <!-- 日志级别变更穿透 -->
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+
+    <!-- drop duplicate message是用来过滤重复日志的-->
+    <turboFilter class="ch.qos.logback.classic.turbo.DuplicateMessageFilter"/>
+
+    <property scope="context" resource="log.properties"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%green(%d{yyyy-MM-dd HH:mm:ss.SSS}) %magenta([%thread]) %highlight(%-5level) %cyan(%logger{36}) -
+                %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/query.log</file>
+        <append>true</append>
+        <!-- set immediateFlush to false for much higher logging throughput -->
+        <immediateFlush>true</immediateFlush>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>/query.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+
+            <!-- keep 30 days' worth of history capped at 3GB total size -->
+            <maxHistory>${max.history:-30}</maxHistory>
+            <!--<totalSizeCap>3GB</totalSizeCap>-->
+
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+
+    <appender name="HTML_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <file>/query.jsp</file>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.GEventEvaluator">
+                <expression>
+                    ${file.html.enable} =~ /true/
+                </expression>
+            </evaluator>
+            <OnMismatch>DENY</OnMismatch>
+            <OnMatch>ACCEPT</OnMatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- rollover daily -->
+            <fileNamePattern>/query.%d{yyyy-MM-dd}.%i.html</fileNamePattern>
+            <maxFileSize>${file.html.size:-512MB}</maxFileSize>
+            <maxHistory>1</maxHistory>
+            <totalSizeCap>${file.html.size:-512MB}</totalSizeCap>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="ch.qos.logback.classic.html.HTMLLayout">
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg</pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+    <!-- marker email send -->
+    <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+        <!-- event描述信息 -->
+        <discriminator class="ch.qos.logback.classic.sift.MDCBasedDiscriminator">
+            <key>host</key>
+            <defaultValue>none</defaultValue>
+        </discriminator>
+        <!-- email  -->
+        <smtpHost>${smtp.host}</smtpHost>
+        <smtpPort>${smtp.port}</smtpPort>
+        <username>${smtp.username}</username>
+        <password>${smtp.password}</password>
+        <to>${smtp.to}</to>
+        <from>${smtp.from}</from>
+        <subject>【ERROR】: %logger{0} from %X{host}</subject>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%date %-5level %logger{35} - %message%n</pattern>
+        </layout>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator class="ch.qos.logback.classic.boolex.GEventEvaluator">
+                <expression>
+                    ${smtp.enable} =~ /true/
+                </expression>
+            </evaluator>
+            <OnMismatch>DENY</OnMismatch>
+            <OnMatch>ACCEPT</OnMatch>
+        </filter>
+        <evaluator class="ch.qos.logback.classic.boolex.OnMarkerEvaluator">
+            <marker>NOTIFY</marker>
+            <!-- you specify add as many markers as you want -->
+            <!--<marker>TRANSACTION_FAILURE</marker>-->
+        </evaluator>
+        <cyclicBufferTracker class="ch.qos.logback.core.spi.CyclicBufferTracker">
+            <!-- send just one log entry per email -->
+            <bufferSize>1</bufferSize>
+        </cyclicBufferTracker>
+    </appender>
+
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>/query-error.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>/query-error.%d{yyyy-MM-dd}.log.gz</fileNamePattern>
+            <maxHistory>${max.history:-30}</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.apache.zookeeper" level="${log.level:-info}">
+        <appender-ref ref="ERROR"/>
+    </logger>
+
+    <root level="${log.level:-info}">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="HTML_FILE"/>
+        <!--        <appender-ref ref="EMAIL"/>-->
+    </root>
+</configuration>
+
+

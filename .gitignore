@@ -1,0 +1,19 @@
+/.idea/
+
+target/classes/
+target/generated-sources/
+target/maven-archiver/
+target/maven-status/
+target/zooui-0.1-SNAPSHOT 2/META-INF/
+target/zooui-0.1-SNAPSHOT 2/about.html
+target/zooui-0.1-SNAPSHOT 2/config/
+target/zooui-0.1-SNAPSHOT 2/icons/
+target/zooui-0.1-SNAPSHOT 2/logback.xml
+target/zooui-0.1-SNAPSHOT 2/org/
+target/zooui-0.1-SNAPSHOT.jar
+target/zooui-0.1-SNAPSHOT/META-INF/
+target/zooui-0.1-SNAPSHOT/about.html
+target/zooui-0.1-SNAPSHOT/config/
+target/zooui-0.1-SNAPSHOT/icons/
+target/zooui-0.1-SNAPSHOT/logback.xml
+target/zooui-0.1-SNAPSHOT/org/
