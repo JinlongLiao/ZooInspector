@@ -20,3 +20,5 @@ target/zooui-0.1-SNAPSHOT/org/
 /target/
 /logs/
 /firestorm.log
+/*.iml
+/zui-inspector.iml

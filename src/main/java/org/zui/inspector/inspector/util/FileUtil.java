@@ -18,8 +18,9 @@ public class FileUtil {
     public static final String ROOT_PATH;
 
     static {
-        ROOT_PATH = Objects.isNull(resource) ? (System.getenv("ZUI_ROOT_PATH")) + File.separator + "conf/"
-                : (resource.getPath() + File.separator);
+        ROOT_PATH = Objects.isNull((System.getenv("ZUI_ROOT_PATH"))) ?
+                (resource.getPath() + File.separator) :
+                (System.getenv("ZUI_ROOT_PATH")) + File.separator + "conf/";
         if (Objects.isNull(ROOT_PATH)) {
             log.error("ZUI_ROOT_PATH 未配置，脚本存在问题");
             System.exit(-1);
@@ -32,7 +33,7 @@ public class FileUtil {
     }
 
     public static String appendRootPath(String fileName) {
-        return ROOT_PATH+fileName;
+        return ROOT_PATH + fileName;
     }
 
 }
