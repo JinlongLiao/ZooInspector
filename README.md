@@ -30,8 +30,8 @@ Zookeeper 可视化客户端,基于Apache的 ZooInspector 进行修改。
 2.  执行 zuiStart.sh/cmd 启动
 
 
-![输入图片说明](https://gitee.com/JinlongLiao/ZooInspector/blob/master/img/struct.png "文件结构")
-![输入图片说明](https://gitee.com/JinlongLiao/ZooInspector/blob/master/img/softepng.png"系统图片")
+![输入图片说明](./img/struct.png "文件结构")
+![输入图片说明](./img/softepng.png "系统图片")
 
 #### 参与贡献
 
